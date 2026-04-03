@@ -86,7 +86,9 @@ async def health() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "ok"}
 
-
+@app.post("/api/test-post")
+async def test_post():
+    return {"success": True, "message": "POST works!"}
 # Serve frontend static files in production / desktop mode
 # Look for the built frontend in several possible locations
 def _find_frontend_dist() -> Path | None:
