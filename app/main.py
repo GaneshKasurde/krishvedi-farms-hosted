@@ -86,6 +86,9 @@ def _find_frontend_dist() -> Path | None:
         Path(__file__).resolve().parent.parent.parent / "frontend" / "dist",
         # Desktop/PyInstaller: renderer/ next to the executable
         Path(sys.executable).parent / "renderer",
+        @app.get("/api/test-get")
+        async def test_get():
+            return {"success": True, "message": "GET works!"}
         # Desktop: resources/renderer
         Path(getattr(sys, "_MEIPASS", ".")) / "renderer",
     ]
