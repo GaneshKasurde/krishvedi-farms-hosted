@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pandas
+openpyxl
+python-multipart
+reportlab
+pydantic
+openai
+python-dotenv
+httptools
+email_validator
