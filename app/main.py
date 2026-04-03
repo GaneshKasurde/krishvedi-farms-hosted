@@ -37,7 +37,6 @@ async def _cleanup_loop() -> None:
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan: start background tasks."""
     # Initialize database
-    init_db()
     logger.info("Database initialized")
     
     # Start cleanup task
