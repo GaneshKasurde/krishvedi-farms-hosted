@@ -33,23 +33,12 @@ async def _cleanup_loop() -> None:
             logger.info(f"Cleaned up {count} expired session(s)")
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """Application lifespan: start background tasks."""
-    # Initialize database
-    logger.info("Database initialized")
-    
-    # Start cleanup task
-    task = asyncio.create_task(_cleanup_loop())
-    logger.info("Krishvedi Farms Hosted backend started")
-    yield
-    task.cancel()
-    try:
-        await task
-    except asyncio.CancelledError:
-        pass
-    logger.info("Krishvedi Farms Hosted backend stopped")
-
+# Remove lifespan for now to test
+app = FastAPI(
+    title="Krishvedi Farms Hosted",
+    description="Krishvedi Farms Sales Analysis - Hosted Version",
+    version="1.0.0",
+)
 
 app = FastAPI(
     title="Krishvedi Farms Hosted",
