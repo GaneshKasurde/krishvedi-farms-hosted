@@ -17,7 +17,7 @@ from app.services.parser_krishvedi import (
     get_monthly_summary,
 )
 
-router = APIRouter(prefix="/api/data", tags=["Data"])
+router = APIRouter(prefix="/data", tags=["Data"])
 
 @router.post("/upload")
 async def upload_file(
