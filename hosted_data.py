@@ -55,12 +55,21 @@ async def upload_file(
             )
         
         # Store data in database
-        data_to_store = {
-            "months": months_to_process,
-            "raw_data": df.to_dict(orient="records"),
-            "warnings": warnings,
-        }
-        
+        def convert_to_json_serializable(obj):
+    import pandas as pd
+    if isinstance(obj, pd.Timestamp):
+        return obj.isoformat()
+    elif isinstance(obj, dict):
+        return {k: convert_to_json_serializable(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_to_json_serializable(i) for i in obj]
+    return obj
+
+data_to_store = {
+    "months": months_to_process,
+    "raw_data": convert_to_json_serializable(df.to_dict(orient="records")),
+    "warnings": warnings,
+}
         save_report(data_file.filename, json.dumps(data_to_store))
         
         return {
