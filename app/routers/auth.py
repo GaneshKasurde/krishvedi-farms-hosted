@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from app.database import get_admin
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
-
 class LoginRequest(BaseModel):
     username: str
     password: str
