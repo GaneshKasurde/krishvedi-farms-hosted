@@ -91,7 +91,6 @@ try:
     logger.info("hosted_data router registered")
 except Exception as e:
     logger.error(f"hosted_data router FAILED: {e}")
-    ]
     for p in candidates:
         if p.is_dir() and (p / "index.html").exists():
             return p
