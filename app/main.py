@@ -33,12 +33,20 @@ async def _cleanup_loop() -> None:
             logger.info(f"Cleaned up {count} expired session(s)")
 
 
-# Remove lifespan for now to test
-app = FastAPI(
-    title="Krishvedi Farms Hosted",
-    description="Krishvedi Farms Sales Analysis - Hosted Version",
-    version="1.0.0",
-)
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Application lifespan: start background cleanup task."""
+    init_db()
+    task = asyncio.create_task(_cleanup_loop())
+    logger.info("Krishvedi Farms Backend started")
+    yield
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+    logger.info("Krishvedi Farms Backend stopped")
+
 
 app = FastAPI(
     title="Krishvedi Farms Hosted",
@@ -56,9 +64,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routers under /api prefix
-app.include_router(auth.router, prefix="/api", tags=["Authentication"])
-app.include_router(hosted_data.router, prefix="/api", tags=["Data"])
+# Register routers - auth and hosted_data have their own /api prefix
+app.include_router(auth.router, tags=["Authentication"])
+app.include_router(hosted_data.router, tags=["Data"])
 app.include_router(upload.router, prefix="/api", tags=["Upload"])
 app.include_router(upload_krishvedi.router, prefix="/api", tags=["Krishvedi Upload"])
 app.include_router(analysis.router, prefix="/api", tags=["Analysis"])
@@ -74,39 +82,3 @@ app.include_router(expenses.router, prefix="/api", tags=["Expenses"])
 async def health() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "ok"}
-
-@app.post("/api/test-post")
-async def test_post():
-    return {"success": True, "message": "POST works!"}
-try:
-    from app.routers import auth
-    app.include_router(auth.router, tags=["Authentication"])  # No prefix="/api"
-    logger.info("auth router registered")
-except Exception as e:
-    logger.error(f"auth router FAILED: {e}\n{traceback.format_exc()}")
-
-try:
-    from app.routers import hosted_data
-    app.include_router(hosted_data.router, tags=["Data"])  # No prefix="/api"
-    logger.info("hosted_data router registered")
-except Exception as e:
-    logger.error(f"hosted_data router FAILED: {e}")
-    for p in candidates:
-        if p.is_dir() and (p / "index.html").exists():
-            return p
-    return None
-
-
-_frontend_dir = _find_frontend_dist()
-if _frontend_dir:
-    # Serve index.html for all non-API routes (SPA fallback)
-    from fastapi.responses import FileResponse
-
-    @app.get("/{full_path:path}")
-    async def serve_spa(full_path: str):
-        file_path = _frontend_dir / full_path
-        if full_path and file_path.is_file():
-            return FileResponse(file_path)
-        return FileResponse(_frontend_dir / "index.html")
-
-    logger.info(f"Serving frontend from {_frontend_dir}")
