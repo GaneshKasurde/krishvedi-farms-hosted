@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from app.database import get_admin
 
-router = APIRouter(prefix="/api/auth", tags=["Authentication"])
+router = APIRouter("auth", tags=["Authentication"])
 class LoginRequest(BaseModel):
     username: str
     password: str
