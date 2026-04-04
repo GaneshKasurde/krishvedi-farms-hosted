@@ -65,8 +65,8 @@ app.add_middleware(
 )
 
 # Register routers - auth and hosted_data have their own /api prefix
-app.include_router(auth.router, tags=["Authentication"])
-app.include_router(hosted_data.router, tags=["Data"])
+app.include_router(auth.router, prefix="/api", tags=["Auth"])
+app.include_router(hosted_data.router, prefix="/api", tags=["Data"])
 app.include_router(upload.router, prefix="/api", tags=["Upload"])
 app.include_router(upload_krishvedi.router, prefix="/api", tags=["Krishvedi Upload"])
 app.include_router(analysis.router, prefix="/api", tags=["Analysis"])
