@@ -78,19 +78,19 @@ async def health() -> dict[str, str]:
 @app.post("/api/test-post")
 async def test_post():
     return {"success": True, "message": "POST works!"}
-# Serve frontend static files in production / desktop mode
-# Look for the built frontend in several possible locations
-def _find_frontend_dist() -> Path | None:
-    candidates = [
-        # Development: frontend/dist relative to backend/
-        Path(__file__).resolve().parent.parent.parent / "frontend" / "dist",
-        # Desktop/PyInstaller: renderer/ next to the executable
-        Path(sys.executable).parent / "renderer",
-        @app.get("/api/test-get")
-        async def test_get():
-            return {"success": True, "message": "GET works!"}
-        # Desktop: resources/renderer
-        Path(getattr(sys, "_MEIPASS", ".")) / "renderer",
+try:
+    from app.routers import auth
+    app.include_router(auth.router, tags=["Authentication"])  # No prefix="/api"
+    logger.info("auth router registered")
+except Exception as e:
+    logger.error(f"auth router FAILED: {e}\n{traceback.format_exc()}")
+
+try:
+    from app.routers import hosted_data
+    app.include_router(hosted_data.router, tags=["Data"])  # No prefix="/api"
+    logger.info("hosted_data router registered")
+except Exception as e:
+    logger.error(f"hosted_data router FAILED: {e}")
     ]
     for p in candidates:
         if p.is_dir() and (p / "index.html").exists():
