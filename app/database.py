@@ -3,7 +3,11 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-DB_PATH = Path(__file__).parent / "data.db"
+# Use /tmp on Render, local path otherwise
+if os.environ.get('RENDER'):
+    DB_PATH = Path("/tmp/data.db")
+else:
+    DB_PATH = Path(__file__).parent / "data.db"
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -28,7 +32,6 @@ def init_db():
         );
     """)
     
-    # Create default admin if not exists (change password here)
     cursor = conn.execute("SELECT COUNT(*) as count FROM admin")
     if cursor.fetchone()[0] == 0:
         conn.execute("INSERT INTO admin (username, password) VALUES (?, ?)", 
@@ -45,7 +48,6 @@ def get_admin():
 
 def save_report(filename: str, data_json: str):
     conn = get_db()
-    # Delete old report data
     conn.execute("DELETE FROM report_data")
     conn.execute("INSERT INTO report_data (filename, data_json) VALUES (?, ?)", 
                  (filename, data_json))
