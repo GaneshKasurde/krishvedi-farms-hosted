@@ -1,0 +1,2 @@
+export const formatLakhs = (value: number) => (value / 100000).toFixed(2) + ' L'
+export const formatNumber = (value: number) => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(value)
